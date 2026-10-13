@@ -56,11 +56,14 @@ final class DetailStore {
                 guard !Task.isCancelled else { return }
                 content = loaded
                 phase = .loaded
+                if attempts > 1 {
+                    screenshotLog("Loaded the page of \(item.name) (has content: \(hasContent))")
+                }
                 return
             } catch {
                 guard !Task.isCancelled else { return }
                 lastError = error
-                print("Loading \(item.name) failed (attempt \(attempt) of \(attempts)): \(error)")
+                screenshotLog("Loading \(item.name) failed (attempt \(attempt) of \(attempts)): \(error)")
                 guard attempt < attempts else { break }
                 try? await Task.sleep(for: .seconds(Double(attempt * 3)))
             }

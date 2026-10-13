@@ -117,7 +117,7 @@ for scene in "${SCENES[@]}"; do
   for attempt in 1 2 3; do
     xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
     sleep 1
-    rm -f "$CONTAINER/tmp/screenshot-ready"
+    rm -f "$CONTAINER/tmp/screenshot-ready" "$CONTAINER/tmp/screenshot-log.txt"
     # Launch with the app's console attached to a pseudo-terminal (so its output is line-buffered) and kept in a
     # log, which is printed when the scene does not become ready.
     log="$TMP/iphone-$scene-$attempt.log"
@@ -132,6 +132,8 @@ for scene in "${SCENES[@]}"; do
     if [ ! -f "$CONTAINER/tmp/screenshot-ready" ]; then
       echo "The app did not show $scene with live data (attempt $attempt). Its console:"
       tail -n 80 "$log" | sed 's/^/    /' || true
+      echo "Its screenshot log:"
+      tail -n 80 "$CONTAINER/tmp/screenshot-log.txt" 2>/dev/null | sed 's/^/    /' || true
       xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
       kill "$launcher" 2>/dev/null || true
       wait "$launcher" 2>/dev/null || true

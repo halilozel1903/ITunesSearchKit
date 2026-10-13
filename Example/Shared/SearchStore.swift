@@ -80,11 +80,14 @@ final class SearchStore {
                 }
                 results = items
                 phase = .loaded
+                if attempts > 1 {
+                    screenshotLog("Search for \"\(key.query)\" loaded \(items.count) results with artwork")
+                }
                 return
             } catch {
                 guard !Task.isCancelled else { return }
                 lastError = error
-                print("Search for \"\(key.query)\" failed (attempt \(attempt) of \(attempts)): \(error)")
+                screenshotLog("Search for \"\(key.query)\" failed (attempt \(attempt) of \(attempts)): \(error)")
                 guard attempt < attempts else { break }
                 try? await Task.sleep(for: .seconds(Double(attempt * 3)))
             }

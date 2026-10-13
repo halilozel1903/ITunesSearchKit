@@ -106,7 +106,7 @@ enum ScreenshotScene: String {
                 return data
             } catch {
                 lastError = error
-                print("Screenshot image \(url) failed (attempt \(attempt + 1) of 4): \(error)")
+                screenshotLog("Screenshot image \(url) failed (attempt \(attempt + 1) of 4): \(error)")
             }
         }
         // A view that went away cancels its load; that is not a failure.
@@ -153,7 +153,7 @@ actor ScreenshotImageTracker {
         while !Task.isCancelled {
             let state = await shared.snapshot()
             if state.failed > 0 {
-                print("Screenshot scene: \(state.failed) image(s) failed to load; not marking it ready")
+                screenshotLog("Screenshot scene: \(state.failed) image(s) failed to load; not marking it ready")
                 return false
             }
             if state.started > 0, state.inFlight == 0, Date().timeIntervalSince(state.lastChange) >= quiet {
@@ -161,7 +161,7 @@ actor ScreenshotImageTracker {
             }
             if Date().timeIntervalSince(lastReport) >= 10 {
                 lastReport = Date()
-                print("Screenshot scene: waiting for images (started \(state.started), in flight \(state.inFlight))")
+                screenshotLog("Screenshot scene: waiting for images (started \(state.started), in flight \(state.inFlight))")
             }
             try? await Task.sleep(for: .milliseconds(250))
         }
@@ -176,14 +176,15 @@ extension View {
     func signalsScreenshotReady(_ scene: ScreenshotScene?, when isReady: Bool) -> some View {
         task(id: isReady) {
             guard let scene, isReady else { return }
+            screenshotLog("Screenshot scene \(scene.rawValue): data loaded, waiting for its images")
             // Give the views a moment to start loading their images.
             try? await Task.sleep(for: .seconds(1.5))
             guard await ScreenshotImageTracker.waitUntilSettled(), !Task.isCancelled else { return }
             do {
                 try scene.rawValue.write(to: ScreenshotScene.markerURL, atomically: true, encoding: .utf8)
-                print("Screenshot scene \(scene.rawValue) is ready")
+                screenshotLog("Screenshot scene \(scene.rawValue) is ready")
             } catch {
-                print("Could not write the screenshot marker: \(error)")
+                screenshotLog("Could not write the screenshot marker: \(error)")
                 return
             }
             #if os(macOS)
@@ -191,6 +192,36 @@ extension View {
                 ScreenshotWindowCoordinator.shared.sceneIsReady()
             }
             #endif
+        }
+    }
+}
+
+/// Prints a line and, in a screenshot scene, also appends it to `screenshot-log.txt` in the temporary directory. The
+/// iPhone screenshot script prints that file when a scene does not become ready, since the app's console is not
+/// reliably captured on CI.
+func screenshotLog(_ message: String) {
+    print(message)
+    guard ScreenshotScene.current != nil else { return }
+    ScreenshotLog.append(message)
+}
+
+enum ScreenshotLog {
+    private static let lock = NSLock()
+
+    static var url: URL {
+        URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("screenshot-log.txt")
+    }
+
+    static func append(_ message: String) {
+        lock.lock()
+        defer { lock.unlock() }
+        let line = Data((message + "\n").utf8)
+        if let handle = try? FileHandle(forWritingTo: url) {
+            defer { try? handle.close() }
+            _ = try? handle.seekToEnd()
+            try? handle.write(contentsOf: line)
+        } else {
+            try? line.write(to: url)
         }
     }
 }
