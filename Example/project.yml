@@ -1,0 +1,70 @@
+name: ITunesSearchDemo
+options:
+  bundleIdPrefix: io.github.halilozel1903
+  deploymentTarget:
+    macOS: "14.0"
+    iOS: "17.0"
+packages:
+  ITunesSearchKit:
+    path: ..
+targets:
+  TunescopeMac:
+    type: application
+    platform: macOS
+    sources:
+      - Shared
+      - Mac
+    dependencies:
+      - package: ITunesSearchKit
+        product: ITunesSearchKit
+      - package: ITunesSearchKit
+        product: ITunesSearchUI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.halilozel1903.TunescopeMac
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Tunescope
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.music
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Halil Özel"
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        ENABLE_HARDENED_RUNTIME: NO
+        CODE_SIGN_IDENTITY: "-"
+  TunescopePhone:
+    type: application
+    platform: iOS
+    sources:
+      - Shared
+      - Phone
+    dependencies:
+      - package: ITunesSearchKit
+        product: ITunesSearchKit
+      - package: ITunesSearchKit
+        product: ITunesSearchUI
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.halilozel1903.TunescopePhone
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Tunescope
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIUserInterfaceStyle: Dark
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: "1"
+schemes:
+  TunescopeMac:
+    build:
+      targets:
+        TunescopeMac: all
+    run:
+      config: Debug
+  TunescopePhone:
+    build:
+      targets:
+        TunescopePhone: all
+    run:
+      config: Debug
