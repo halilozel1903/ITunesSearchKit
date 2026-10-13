@@ -118,10 +118,11 @@ for scene in "${SCENES[@]}"; do
     xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
     sleep 1
     rm -f "$CONTAINER/tmp/screenshot-ready"
-    if ! xcrun simctl launch "$UDID" "$BUNDLE" -screenshot "$scene"; then
-      echo "Could not launch the app for iphone-$scene (attempt $attempt), retrying"
-      continue
-    fi
+    # Launch with the app's console attached to a pseudo-terminal (so its output is line-buffered) and kept in a
+    # log, which is printed when the scene does not become ready.
+    log="$TMP/iphone-$scene-$attempt.log"
+    xcrun simctl launch --console-pty "$UDID" "$BUNDLE" -screenshot "$scene" > "$log" 2>&1 &
+    launcher=$!
     # The app writes this marker once the live results and every visible image are on screen.
     waited=0
     while [ ! -f "$CONTAINER/tmp/screenshot-ready" ] && [ "$waited" -lt 180 ]; do
@@ -129,13 +130,20 @@ for scene in "${SCENES[@]}"; do
       waited=$((waited + 1))
     done
     if [ ! -f "$CONTAINER/tmp/screenshot-ready" ]; then
-      echo "The app did not show $scene with live data (attempt $attempt), retrying"
+      echo "The app did not show $scene with live data (attempt $attempt). Its console:"
+      tail -n 80 "$log" | sed 's/^/    /' || true
+      xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
+      kill "$launcher" 2>/dev/null || true
+      wait "$launcher" 2>/dev/null || true
       continue
     fi
     # Let the image fade-ins and the navigation push finish.
     sleep $((3 + attempt * 2))
     rm -f "$capture"
     xcrun simctl io "$UDID" screenshot "$capture"
+    xcrun simctl terminate "$UDID" "$BUNDLE" 2>/dev/null || true
+    kill "$launcher" 2>/dev/null || true
+    wait "$launcher" 2>/dev/null || true
     if valid_capture "$capture" "$HOME_CAPTURE" "$previous"; then
       ok=1
       break

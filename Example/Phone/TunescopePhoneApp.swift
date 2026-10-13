@@ -68,6 +68,7 @@ struct PhoneRootView: View {
               let first = store.results.first
         else { return }
         openedFirstResult = true
+        print("Screenshot scene \(scene.rawValue): opening \(first.name) (\(store.results.count) results)")
         path = [first]
     }
 }

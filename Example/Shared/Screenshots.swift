@@ -149,6 +149,7 @@ actor ScreenshotImageTracker {
     /// Waits until at least one image has loaded and none started or finished for `quiet` seconds.
     /// Returns false, and the scene is never reported ready, when an image failed to load.
     static func waitUntilSettled(quiet: TimeInterval = 2.5) async -> Bool {
+        var lastReport = Date()
         while !Task.isCancelled {
             let state = await shared.snapshot()
             if state.failed > 0 {
@@ -157,6 +158,10 @@ actor ScreenshotImageTracker {
             }
             if state.started > 0, state.inFlight == 0, Date().timeIntervalSince(state.lastChange) >= quiet {
                 return true
+            }
+            if Date().timeIntervalSince(lastReport) >= 10 {
+                lastReport = Date()
+                print("Screenshot scene: waiting for images (started \(state.started), in flight \(state.inFlight))")
             }
             try? await Task.sleep(for: .milliseconds(250))
         }
