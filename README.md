@@ -32,7 +32,7 @@ for track in album.tracks {
 
 ## Screenshots
 
-Captured live by CI from the example app, *Tunescope*, on the Mac and on an iPhone simulator. Every scene searches the **live iTunes Search API** at the time CI ran and shows the real results with their real artwork: songs for "daft punk", the album *Random Access Memories* with its songs, the latest episodes of *The Daily*, albums for "taylor swift" and the movie *Interstellar*. The app reports ready only after the results and every visible image have loaded; if the API or any image cannot be reached, the job fails instead of saving a capture.
+Captured live by CI from the example app, *Tunescope*, on the Mac and on an iPhone simulator. Every scene searches the **live iTunes Search API** at the time CI ran and shows the real results with their real artwork: songs for "daft punk", the album *Random Access Memories* with its songs, the latest episodes of *The Daily*, albums for "taylor swift" and the App Store page of *Procreate*. The app reports ready only after the results and every visible image have loaded; if the API or any image cannot be reached, the job fails instead of saving a capture.
 
 | Mac: search | Mac: album |
 | :---: | :---: |
@@ -40,7 +40,7 @@ Captured live by CI from the example app, *Tunescope*, on the Mac and on an iPho
 
 | Mac: podcast | iPhone: search | iPhone: detail |
 | :---: | :---: | :---: |
-| <img src="docs/screenshots/mac-podcast.png" alt="Mac: a podcast page with its artwork, publisher and episode count, and the latest episodes with dates, notes and lengths" width="320"> | <img src="docs/screenshots/iphone-search.png" alt="iPhone: category chips above a two-column grid of album artwork for the search taylor swift" width="200"> | <img src="docs/screenshots/iphone-detail.png" alt="iPhone: a movie page with the poster, director, genre, year, rating, running time and the description" width="200"> |
+| <img src="docs/screenshots/mac-podcast.png" alt="Mac: a podcast page with its artwork, publisher and episode count, and the latest episodes with dates, notes and lengths" width="320"> | <img src="docs/screenshots/iphone-search.png" alt="iPhone: category chips above a two-column grid of album artwork for the search taylor swift" width="200"> | <img src="docs/screenshots/iphone-detail.png" alt="iPhone: an app page with the icon, developer, rating, App Store screenshots and the description" width="200"> |
 
 ## Features
 

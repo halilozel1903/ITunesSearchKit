@@ -17,7 +17,7 @@ enum ScreenshotScene: String {
     case album
     /// Mac: the first podcast found for "the daily new york times", with its latest episodes.
     case podcast
-    /// iPhone: the first movie found for "interstellar".
+    /// iPhone: the first app found for "procreate", with its App Store screenshots.
     case detail
 
     /// The scene this launch asked for. A `mac-` or `iphone-` prefix is accepted too.
@@ -63,7 +63,7 @@ enum ScreenshotScene: String {
             #endif
         case .album: return .albums
         case .podcast: return .podcasts
-        case .detail: return .movies
+        case .detail: return .apps
         }
     }
 
@@ -78,7 +78,7 @@ enum ScreenshotScene: String {
             #endif
         case .album: return "daft punk random access memories"
         case .podcast: return "the daily new york times"
-        case .detail: return "interstellar"
+        case .detail: return "procreate"
         }
     }
 
